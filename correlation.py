@@ -7,7 +7,7 @@ import math
 from sklearn.cross_validation import train_test_split
 from sklearn.model_selection import KFold, cross_val_score
 from decimal import *
-from sklearn import linear_model
+from sklearn import linear_model, ensemble
 
 # DEFINED VARIABLES
 test_size = .2
@@ -92,8 +92,35 @@ def remove_single_value_columns(train_df, test_df):
             columns_to_remove.append(col)
     remove_columns(columns_to_remove, train_df, test_df)
 
+def get_correlation(eps=.05, corr_level=.8):
+    train_df = pd.DataFrame.from_csv('dataset/train.csv')
+    corr_df = train_df.corr(method='pearson')
+    # plt.matshow(corr_df)
+    # plt.show()
+    for i, row in corr_df.iterrows():
+        for col, value in row.iteritems():
+            if abs(value) >= corr_level and i != col:
+                print(col, i)
+    # plot hist from 5 more correlated features between SalesPrice
+    corr_SalePrice = [(name, value) for name, value in corr_df['SalePrice'].iteritems()]
+    corr_SP_sorted = sorted(corr_SalePrice, key=lambda x: x[1], reverse=True)
+    for i in range(6):
+        element = corr_SP_sorted[i]
+        name = element[0]
+        plt.hist(train_df[name], normed=True, bins=30)
+        plt.ylabel('Probability');
+        plt.xlabel(name);
+        plt.savefig('./images/{}'.format(name))
+        plt.show()
+    # generate scatter matrix
+    names = [el[0] for el in corr_SP_sorted[0:6]]
+    pd.tools.plotting.scatter_matrix(pd.DataFrame(train_df, columns=names))
+    plt.savefig('./images/scatter_matrix')
+    plt.show()
+
+
 def remove_correlation(train_df, test_df, eps=.05, save=False, corr_level=.8):
-    corr_df = filled_train_df.corr(method='pearson')
+    corr_df = train_df.corr(method='pearson')
     if save:
         plt.matshow(corr_df)
         plt.show()
@@ -102,7 +129,7 @@ def remove_correlation(train_df, test_df, eps=.05, save=False, corr_level=.8):
         for col, value in row.iteritems():
             if abs(value) + eps >= corr_level and i != col and col < len(row)-1:
                 columns_to_remove.append(col)
-    remove_columns(list(set(columns_to_remove)), train_df, test_df)
+    # remove_columns(list(set(columns_to_remove)), train_df, test_df)
 
 def get_regression_models():
     models = [
@@ -112,18 +139,25 @@ def get_regression_models():
         ('La',linear_model.Lars(positive=True)),
         ('OMP', linear_model.OrthogonalMatchingPursuit()),
         ('BR', linear_model.BayesianRidge()),
+        ('GB', ensemble.GradientBoostingRegressor(alpha=0.9, criterion='friedman_mse', init=None, learning_rate=0.1,
+                                                  loss='ls', max_depth=5, max_features=None, min_samples_leaf=1,
+                                                  min_samples_split=2, min_weight_fraction_leaf=.0, n_estimators=400,
+                                                  presort='auto', random_state=None, subsample=1.0, verbose=0,
+                                                  warm_start=False)),
+        ('RF', ensemble.RandomForestRegressor()),
+        ('AB', ensemble.AdaBoostRegressor())
     ]
     return models
 
-def fit_models(features, target, num_folds, test_size=.2, save=False):
+def fit_models(features, target, test_df, num_folds, test_size=.2, save=False):
     results = {}
-    a_train, a_test, b_train, b_test = train_test_split(features, target, test_size=test_size)
+    # X_train, X_test, Y_train, Y_test = train_test_split(features, target, test_size=test_size)
     for i, model in enumerate(get_regression_models()):
         m = model[1]
         kfold = KFold(n_splits=num_folds)
-        result = cross_val_score(m, a_train, b_train, cv=kfold)
-        m.fit(a_train, b_train)
-        predicted = m.predict(filled_test_df)
+        result = cross_val_score(m, features, target, cv=kfold)
+        m.fit(features, target)
+        predicted = m.predict(test_df)
         pred_df = pd.DataFrame(np.transpose(predicted), columns=['SalePrice'])\
                     .rename(index={x: x + 1461 for x in range(len(predicted))})
         pred_df.index.name = 'Id'
@@ -131,6 +165,7 @@ def fit_models(features, target, num_folds, test_size=.2, save=False):
             pred_df.to_csv('dataset/prediction/predict{}.csv'.format(model[0]), header=True)
         results[model[0]] = {
             'score': result.copy(),
+            'score_mean': np.mean(result),
             'predict': pred_df.copy()
         }
     return results
@@ -141,6 +176,10 @@ test_header, test_dataset = read_dataset('dataset/test.csv', 80, remove_header=T
 
 # analise = analising_missing_values(train_dataset)
 # cols_to_remove = get_na_cols_to_remove(analise)
+
+# correlation matrix
+
+# get_correlation()
 
 # hashing trick
 
@@ -154,16 +193,19 @@ filled_test_df = test_df.fillna(test_df.mean())
 
 # remove single value columns
 
-remove_single_value_columns(filled_train_df, filled_test_df)
+# remove_single_value_columns(filled_train_df, filled_test_df)
+print len(filled_train_df.columns)
 
 # correlation
 
-remove_correlation(filled_train_df, filled_test_df)
-
+print len(filled_train_df.columns)
 # predicting
-import pdb; pdb.set_trace()
 features_all = filled_train_df.iloc[:,0:-1]
 target = filled_train_df.iloc[:,-1]
-predictions = fit_models(features_all, target, num_folds, save=True)
+predictions = fit_models(features_all, target, filled_test_df, num_folds, save=True)
+ps = [(i, p['score_mean']) for i, p in predictions.iteritems()]
+print ps
+import pdb; pdb.set_trace()
+# confusion matrix
 
- 
+# generate_confusion_matrix(predictions, target)
