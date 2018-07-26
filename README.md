@@ -1,3 +1,11 @@
+# TRABALHO PRÁTICO 1 – Estimativa de Preços de Imóveis (problema de regressão)
+## Informações
+Curso: EEL860 – Tópicos Especiais em Sistemas de Controle (2018/1)
+Aluno: Pedro Santos Eusébio
+DRE: 1130133851
+Período: 11
+repositório: https://github.com/pedroeusebio/machine-learning
+
 # Introdução
 
 A proposta deste relatório é apresentar todo o caminho e desenvolvimento que foi necessário para analisar o *dataset House Prices: Advanced Regression Techniques*.
@@ -6,7 +14,7 @@ A proposta deste relatório é apresentar todo o caminho e desenvolvimento que f
 
 Para a análise desse *dataset* foi necessário avaliação de cada *feature* com o objetivo de entender o conteúdo de cada caracteristia das csas e poder prever melhor o comportamento. Inicialmente, foi feito a análise utilizando a matriz de correlação, o objetivo é entender a relação de cada *feature* ao ponto de descartar as que era mais correlacionadas para não enviesar o modelo. A imagem a seguir ilustra a matriz de correlação:
 
-![gráfico da matriz de correlação](./images/correlation_matrix.png)
+![gráfico da matriz de correlação](https://raw.githubusercontent.com/pedroeusebio/machine-learning/master/images/correlation_matrix.png)
 
 
 Analisando a matriz de correlação percebemos que temos algumas características fortemente correlacionadas. Entre elas:
@@ -33,23 +41,23 @@ def analising_missing_values(dataset):
 Essa função faz a análise de cada coluna, vendo quais são os possiveis valores e a quantidade de valores faltantes (NA). Retorna um dicionário que contém a porcentagem de valores faltantes e quantidade de possiveis valores.
 
 Foi gerado também a matriz de dispersão das features mais correlacionadas com o preço de venda dos imóveis:
-![scatter amtrix](./images/scatter_matrix.png "matriz de dispersão")
+![scatter amtrix](https://raw.githubusercontent.com/pedroeusebio/machine-learning/master/images/scatter_matrix.png "matriz de dispersão")
 
 Essa matriz pode ser usada para ver a disperão simultânea de cada caracteristica simultaneamente ao ponto de verificar como as distribuições são correlacionadas.
 
 Também foram gerados distribuições das *features* mais correlacionadas com o preço de venda das casas, podendo assim ver de maneira mais detalhada cada uma delas. Podemos perceber, no geral, que elas a distribuíção respeita a distribuição normal:
 
-![garage area distribution](./images/GarageArea.png "distribuição da feature GarageArea")
+![garage area distribution](https://raw.githubusercontent.com/pedroeusebio/machine-learning/master/images/GarageArea.png "distribuição da feature GarageArea")
 
-![garage cars distribution](./images/GarageCars.png "distribuição da feature GarageCars")
+![garage cars distribution](https://raw.githubusercontent.com/pedroeusebio/machine-learning/master/images/GarageCars.png "distribuição da feature GarageCars")
 
-![GrLivArea distribution](./images/GrLivArea.png "distribuição da feature GrLivArea")
+![GrLivArea distribution](https://raw.githubusercontent.com/pedroeusebio/machine-learning/master/images/GrLivArea.png "distribuição da feature GrLivArea")
 
-![Sale Price distribution](./images/SalePrice.png "distribuição da feature SalePrice")
+![Sale Price distribution](https://raw.githubusercontent.com/pedroeusebio/machine-learning/master/images/SalePrice.png "distribuição da feature SalePrice")
 
-![OverallQual distribution](./images/OverallQual.png "distribuição da feature OverallQual")
+![OverallQual distribution](https://raw.githubusercontent.com/pedroeusebio/machine-learning/master/images/OverallQual.png "distribuição da feature OverallQual")
 
-![TotalBSMtSF distribution](./images/TotalBSMtSF.png "distribuição da feature TotalBSMtSF")
+![TotalBSMtSF distribution](https://raw.githubusercontent.com/pedroeusebio/machine-learning/master/images/TotalBSMtSF.png "distribuição da feature TotalBSMtSF")
 
 
 # Preparação dos dados
@@ -179,3 +187,4 @@ ensemble.GradientBoostingRegressor(alpha=0.9, criterion='friedman_mse', init=Non
                                    warm_start=False)
 ```
 Com esses parâmetros foi possível melhorar significativamente a posição no Kaggle, saindo de 4083, como o modelo simples de Regressão Linear, para 2358 com o *Gradient Boost*.
+Todos as predições geradas foram salvos em um arquivo csv e estão no repositório do projeto.
