@@ -1,9 +1,13 @@
 # TRABALHO PRÁTICO 1 – Estimativa de Preços de Imóveis (problema de regressão)
 ## Informações
 Curso: EEL860 – Tópicos Especiais em Sistemas de Controle (2018/1)
+
 Aluno: Pedro Santos Eusébio
+
 DRE: 1130133851
+
 Período: 11
+
 repositório: https://github.com/pedroeusebio/machine-learning
 
 # Introdução
